@@ -1,7 +1,10 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
-# jetbrains-backend-coder Changelog
+# coder-gateway-backend changelog
 
 ## [Unreleased]
+
 ### Added
-- Initial scaffold created from [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
+
+- When a process is detected as listening on a port, that port will be forwarded
+  automatically and removed automatically if the process stops listening.
