@@ -21,9 +21,6 @@ import kotlinx.coroutines.withContext
  * /proc/net/ipv{,6} at a regular interval.
  *
  * If a process stops listening the port forward is removed.
- *
- * If the user manually removes a port, it will be added back at the next
- * interval.
  */
 @Suppress("UnstableApiUsage")
 class CoderPortForwardService(
@@ -34,6 +31,8 @@ class CoderPortForwardService(
 
     // TODO: Make customizable.
     // TODO: I also see 63342, 57675, and 56830 for JetBrains.  Are they static?
+    // TODO: If you have multiple IDEs, you will see 5991. 5992, etc.  Can we
+    //       detect all of these and exclude them?
     private val ignoreList = setOf(
         22,   // SSH
         5990, // JetBrains Gateway port.
@@ -68,13 +67,13 @@ class CoderPortForwardService(
                     // Remove ports that are no longer listening.
                     val removed = ports.filterNot { it.hostPortNumber in listeningPorts }
                     if (removed.isNotEmpty()) {
-                        logger.info("removing ports: $removed")
+                        logger.info("removing ports: ${removed.map { it.hostPortNumber }}")
                     }
                     removed.forEach {
                         try {
                             manager.removePort(it)
                         } catch (ex: Exception) {
-                            logger.error("failed to remove port $it", ex)
+                            logger.error("failed to remove port ${it.hostPortNumber}", ex)
                         }
                     }
 
