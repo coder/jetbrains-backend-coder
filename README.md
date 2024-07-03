@@ -11,7 +11,18 @@ to using Coder through Gateway.
 
 ## Installation
 
-- Manually:
+Download the [latest release](https://github.com/coder/jetbrains-backend-coder/releases/latest)
+and install it manually using <kbd>Settings/Preferences</kbd> > <kbd>Plugins
+<small>Host</small></kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from
+disk...</kbd>
 
-  Download the [latest release](https://github.com/coder/jetbrains-backend-coder/releases/latest) and install it manually using
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins <small>Host</small></kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+Alternatively, you can add this plugin to your self-hosted marketplace if you
+have one. This plugin is not currently hosted on the public JetBrains
+marketplace.
+
+Make sure to install it as a host plugin, not a client plugin.
+
+## Features
+
+- Scan `/proc/net/tcp*` files for listening ports and automatically forward
+  them.
