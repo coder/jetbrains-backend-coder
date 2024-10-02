@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support `243.*`.
+
 ## [0.0.2] - 2024-05-23
 
 ### Added
