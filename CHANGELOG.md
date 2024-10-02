@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.0.3] - 2024-10-02
+
 ### Added
 
 - Support `243.*`.
@@ -21,6 +23,7 @@
 - When a process is detected as listening on a port, that port will be forwarded
   automatically and removed automatically if the process stops listening.
 
-[Unreleased]: https://github.com/coder/jetbrains-backend-coder/compare/v0.0.2...HEAD
-[0.0.1]: https://github.com/coder/jetbrains-backend-coder/commits/v0.0.1
+[Unreleased]: https://github.com/coder/jetbrains-backend-coder/compare/v0.0.3...HEAD
+[0.0.3]: https://github.com/coder/jetbrains-backend-coder/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/coder/jetbrains-backend-coder/commits/v0.0.2
+[0.0.1]: https://github.com/coder/jetbrains-backend-coder/commits/v0.0.1
