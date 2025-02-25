@@ -56,6 +56,8 @@ class CoderPortForwardService(
         poller?.cancel()
     }
 
+    class InvalidJsonTypeException(message: String) : Exception(message)
+
     private fun start() {
         val devcontainerFile = CoderBackendSettings.getDevcontainerFile()
         if (devcontainerFile.exists()) {
@@ -66,11 +68,15 @@ class CoderPortForwardService(
                 val portsAttributes = obj.optJSONObject("portsAttributes") ?: JSONObject()
                 portsAttributes.keys().forEach { spec ->
                     portsAttributes.optJSONObject(spec)?.let { attrs ->
-                        val onAutoForward = attrs.optString("onAutoForward")
-                        if (onAutoForward == "ignore") {
+                        val onAutoForward = attrs.opt("onAutoForward")
+                        if (!isValidString(onAutoForward)) {
+                            throw InvalidJsonTypeException("onAutoForward for port $spec is not a string value")
+                        }
+                        val onAutoForwardStr = onAutoForward as String
+                        if (onAutoForwardStr == "ignore") {
                             logger.info("found ignored port specification $spec in devcontainer.json")
                             rules.add(0, PortRule(PortMatcher(spec), false))
-                        } else if (onAutoForward != "") {
+                        } else if (onAutoForwardStr != "") {
                             logger.info("found auto-forward port specification $spec in devcontainer.json")
                             rules.add(0, PortRule(PortMatcher(spec), true))
                         }
@@ -78,7 +84,11 @@ class CoderPortForwardService(
                 }
 
                 val otherPortsAttributes = obj.optJSONObject("otherPortsAttributes") ?: JSONObject()
-                if (otherPortsAttributes.optString("onAutoForward") == "ignore") {
+                val otherPortsAutoForward = otherPortsAttributes.opt("onAutoForward")
+                if (!isValidString(otherPortsAutoForward)) {
+                    throw InvalidJsonTypeException("otherPortsAttributes.onAutoForward is not a string value")
+                }
+                if ((otherPortsAutoForward as String) == "ignore") {
                     logger.info("found ignored setting for otherPortsAttributes in devcontainer.json")
                     defaultForward = false
                 }
@@ -140,5 +150,9 @@ class CoderPortForwardService(
                 delay(5000)
             }
         }
+    }
+
+    private fun isValidString(value: Any?): Boolean {
+        return value != null && value is String
     }
 }
