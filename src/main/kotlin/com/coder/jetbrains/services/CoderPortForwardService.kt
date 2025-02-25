@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import org.json.JSONObject
+import com.coder.jetbrains.settings.CoderBackendSettings
 
 /**
  * Automatically forward ports that have something listening on them by scanning
@@ -56,8 +57,7 @@ class CoderPortForwardService(
     }
 
     private fun start() {
-        // TODO: make path configurable?
-        val devcontainerFile = File(System.getProperty("user.home"), ".cache/JetBrains/devcontainer.json")
+        val devcontainerFile = CoderBackendSettings.getDevcontainerFile()
         if (devcontainerFile.exists()) {
             try {
                 val json = devcontainerFile.readText()
