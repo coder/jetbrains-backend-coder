@@ -28,12 +28,16 @@ class PortMatcher(private val rule: String) {
         return when {
             // Try parsing as single port
             portPart.all { it.isDigit() } -> {
-                MatchRule.SinglePort(portPart.toInt())
+                val port = portPart.toInt()
+                validatePort(port)
+                MatchRule.SinglePort(port)
             }
             // Try parsing as port range (e.g., "40000-55000")
             portPart.matches("^\\d+-\\d+$".toRegex()) -> {
                 val (start, end) = portPart.split('-')
                     .map { it.trim().toInt() }
+                validatePort(start)
+                validatePort(end)
                 require(start <= end) { "Invalid port range: start must be less than or equal to end" }
                 MatchRule.PortRange(start, end)
             }
@@ -46,5 +50,13 @@ class PortMatcher(private val rule: String) {
                 }
             }
         }
+    }
+
+    private fun validatePort(port: Int) {
+        require(port in 0..65535) { "Port number must be between 0 and 65535, got: $port" }
+    }
+
+    companion object {
+        const val MAX_PORT = 65535
     }
 }

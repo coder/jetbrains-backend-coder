@@ -3,6 +3,7 @@ package com.coder.jetbrains.matcher
 import org.junit.Test
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertThrows
 
 class PortMatcherTest {
 
@@ -39,5 +40,25 @@ class PortMatcherTest {
         assertTrue(matcher.matches(8005))
         assertTrue(matcher.matches(8009))
         assertFalse(matcher.matches(8010))
+    }
+
+    @Test
+    fun `test invalid port numbers`() {
+        assertThrows(IllegalArgumentException::class.java) { PortMatcher("65536") }
+        assertThrows(IllegalArgumentException::class.java) { PortMatcher("0-65536") }
+        assertThrows(IllegalArgumentException::class.java) { PortMatcher("70000") }
+    }
+
+    @Test
+    fun `test edge case port numbers`() {
+        // These should work
+        PortMatcher("0")
+        PortMatcher("65535")
+        PortMatcher("0-65535")
+
+        // These combinations should work
+        val matcher = PortMatcher("0-65535")
+        assertTrue(matcher.matches(0))
+        assertTrue(matcher.matches(65535))
     }
 }
