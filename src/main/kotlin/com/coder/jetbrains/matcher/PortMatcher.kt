@@ -7,11 +7,7 @@ class PortMatcher(private val rule: String) {
         data class RegexPort(val pattern: Regex) : MatchRule()
     }
 
-    private val parsedRule: MatchRule
-
-    init {
-        parsedRule = parseRule(rule)
-    }
+    private val parsedRule: MatchRule = parseRule(rule)
 
     fun matches(port: Int): Boolean {
         return when (parsedRule) {
@@ -33,12 +29,10 @@ class PortMatcher(private val rule: String) {
                 MatchRule.SinglePort(port)
             }
             // Try parsing as port range (e.g., "40000-55000")
-            portPart.matches("^\\d+-\\d+$".toRegex()) -> {
+            portPart.matches("^\\d+\\s*-\\s*\\d+$".toRegex()) -> {
                 val (start, end) = portPart.split('-')
                     .map { it.trim().toInt() }
-                validatePort(start)
-                validatePort(end)
-                require(start <= end) { "Invalid port range: start must be less than or equal to end" }
+                validatePortRange(start, end)
                 MatchRule.PortRange(start, end)
             }
             // If not a single port or range, treat as regex
@@ -56,7 +50,9 @@ class PortMatcher(private val rule: String) {
         require(port in 0..65535) { "Port number must be between 0 and 65535, got: $port" }
     }
 
-    companion object {
-        const val MAX_PORT = 65535
+    private fun validatePortRange(start: Int, end: Int) {
+        validatePort(start)
+        validatePort(end)
+        require(start <= end) { "Invalid port range: start must be less than or equal to end" }
     }
 }

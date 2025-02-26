@@ -33,6 +33,13 @@ class PortMatcherTest {
     }
 
     @Test
+    fun `test port range with whitespace`() {
+        val matcher = PortMatcher("20021  - 20024")
+        assertFalse(matcher.matches(20000))
+        assertTrue(matcher.matches(20022))
+    }
+
+    @Test
     fun `test regex`() {
         val matcher = PortMatcher("800[1-9]")
         assertFalse(matcher.matches(8000))
