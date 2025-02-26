@@ -25,6 +25,11 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
 //    implementation(libs.annotations)
+    // We need kotlinx-serialization-json >= 1.7.0 to support allowComments, as
+    // devcontainer.json files often have comments and therefore use
+    // nonstandard JSON syntax. This dependency should be marked compileOnly
+    // once the minimum IDE version we support (pluginSinceBuild in
+    // gradle.properties) is at least 251, which includes version 1.7.2.
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 }
 
