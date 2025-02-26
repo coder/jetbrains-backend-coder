@@ -17,7 +17,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import org.json.JSONObject
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.ExperimentalSerializationApi
 import com.coder.jetbrains.settings.CoderBackendSettings
 
 /**
@@ -56,41 +57,43 @@ class CoderPortForwardService(
         poller?.cancel()
     }
 
-    class InvalidJsonTypeException(message: String) : Exception(message)
+    companion object {
+    @OptIn(ExperimentalSerializationApi::class)
+        private val json = Json {
+            ignoreUnknownKeys = true
+            allowTrailingComma = true
+            allowComments = true
+        }
+    }
 
     private fun start() {
         val devcontainerFile = CoderBackendSettings.getDevcontainerFile()
         if (devcontainerFile.exists()) {
             try {
-                val json = devcontainerFile.readText()
-                val obj = JSONObject(json)
+                val jsonContent = devcontainerFile.readText()
+                val config = json.decodeFromString<DevContainerConfig>(jsonContent)
 
-                val portsAttributes = obj.optJSONObject("portsAttributes") ?: JSONObject()
-                portsAttributes.keys().forEach { spec ->
-                    portsAttributes.optJSONObject(spec)?.let { attrs ->
-                        val onAutoForward = attrs.opt("onAutoForward")
-                        if (!isValidString(onAutoForward)) {
-                            throw InvalidJsonTypeException("onAutoForward for port $spec is not a string value")
-                        }
-                        val onAutoForwardStr = onAutoForward as String
-                        if (onAutoForwardStr == "ignore") {
+                // Process port attributes
+                config.portsAttributes.forEach { (spec, attrs) ->
+                    when (attrs.onAutoForward) {
+                        "ignore" -> {
                             logger.info("found ignored port specification $spec in devcontainer.json")
                             rules.add(0, PortRule(PortMatcher(spec), false))
-                        } else if (onAutoForwardStr != "") {
+                        }
+                        "" -> {}
+                        else -> {
                             logger.info("found auto-forward port specification $spec in devcontainer.json")
                             rules.add(0, PortRule(PortMatcher(spec), true))
                         }
                     }
                 }
 
-                val otherPortsAttributes = obj.optJSONObject("otherPortsAttributes") ?: JSONObject()
-                val otherPortsAutoForward = otherPortsAttributes.opt("onAutoForward")
-                if (!isValidString(otherPortsAutoForward)) {
-                    throw InvalidJsonTypeException("otherPortsAttributes.onAutoForward is not a string value")
-                }
-                if ((otherPortsAutoForward as String) == "ignore") {
-                    logger.info("found ignored setting for otherPortsAttributes in devcontainer.json")
-                    defaultForward = false
+                // Process other ports attributes
+                config.otherPortsAttributes?.let {
+                    if (it.onAutoForward == "ignore") {
+                        logger.info("found ignored setting for otherPortsAttributes in devcontainer.json")
+                        defaultForward = false
+                    }
                 }
             } catch (e: Exception) {
                 logger.warn("Failed to parse devcontainer.json", e)
@@ -150,9 +153,5 @@ class CoderPortForwardService(
                 delay(5000)
             }
         }
-    }
-
-    private fun isValidString(value: Any?): Boolean {
-        return value != null && value is String
     }
 }
