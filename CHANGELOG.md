@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Allow specifying port forwarding behavior in devcontainer.json
+
 ## [0.0.4] - 2025-02-21
 
 ### Added
