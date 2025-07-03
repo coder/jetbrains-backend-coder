@@ -150,7 +150,7 @@ tasks {
     }
 
     buildPlugin {
-        archiveBaseName = providers.gradleProperty("pluginName").get()
+        archiveBaseName = providers.gradleProperty("pluginArtifactName").get()
 //        exclude { "coroutines" in it.name }
     }
 
