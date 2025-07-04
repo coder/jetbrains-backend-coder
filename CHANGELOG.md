@@ -7,6 +7,7 @@
 ### Added
 
 - Allow specifying port forwarding behavior in devcontainer.json
+- support for IntelliJ 2025.2
 
 ## [0.0.4] - 2025-02-21
 
