@@ -3,7 +3,7 @@
 annotations = "24.1.0"
 
 # plugins
-kotlin = "2.0.0"
+kotlin = "2.0.20"
 changelog = "2.2.0"
 gradleIntelliJPlugin = "2.6.0"
 qodana = "2025.1.1"
